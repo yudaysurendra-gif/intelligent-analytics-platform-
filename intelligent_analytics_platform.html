@@ -1,0 +1,386 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --nav-bg: var(--color-background-primary);
+    --card: var(--color-background-primary);
+    --card-border: var(--color-border-tertiary);
+    --muted: var(--color-text-secondary);
+    --accent: #185FA5;
+    --accent2: #0F6E56;
+    --accent3: #993C1D;
+    --accent4: #534AB7;
+    --warn: #BA7517;
+  }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+  .shell { display: flex; height: 100vh; min-height: 700px; font-size: 14px; }
+  .sidebar {
+    width: 220px; min-width: 220px; border-right: 0.5px solid var(--color-border-tertiary);
+    background: var(--color-background-secondary); display: flex; flex-direction: column; padding: 0;
+  }
+  .logo {
+    padding: 18px 20px 14px; border-bottom: 0.5px solid var(--color-border-tertiary);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .logo-icon { width: 30px; height: 30px; border-radius: 8px; background: #185FA5; display: flex; align-items: center; justify-content: center; }
+  .logo-icon i { color: #fff; font-size: 16px; }
+  .logo-text { font-weight: 500; font-size: 15px; color: var(--color-text-primary); line-height: 1.2; }
+  .logo-sub { font-size: 11px; color: var(--muted); }
+  .nav { padding: 12px 10px; flex: 1; }
+  .nav-section { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); padding: 6px 10px 4px; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px;
+    cursor: pointer; color: var(--color-text-secondary); font-size: 13px; margin-bottom: 2px;
+    transition: background 0.15s;
+  }
+  .nav-item:hover { background: var(--color-background-primary); color: var(--color-text-primary); }
+  .nav-item.active { background: var(--color-background-primary); color: var(--color-text-primary); font-weight: 500; }
+  .nav-item.active i { color: #185FA5; }
+  .nav-item i { font-size: 16px; }
+  .nav-badge { margin-left: auto; background: var(--color-background-info); color: var(--color-text-info); font-size: 10px; padding: 1px 7px; border-radius: 20px; font-weight: 500; }
+  .sidebar-footer { padding: 14px 16px; border-top: 0.5px solid var(--color-border-tertiary); display: flex; align-items: center; gap: 10px; }
+  .avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--color-background-info); color: var(--color-text-info); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; flex-shrink: 0; }
+  .avatar-name { font-size: 13px; font-weight: 500; color: var(--color-text-primary); }
+  .avatar-role { font-size: 11px; color: var(--muted); }
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .topbar {
+    padding: 14px 24px; border-bottom: 0.5px solid var(--color-border-tertiary);
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--color-background-primary);
+  }
+  .topbar-title { font-size: 17px; font-weight: 500; color: var(--color-text-primary); }
+  .topbar-sub { font-size: 12px; color: var(--muted); margin-top: 1px; }
+  .topbar-actions { display: flex; align-items: center; gap: 10px; }
+  .btn {
+    display: flex; align-items: center; gap: 6px; padding: 7px 14px;
+    border: 0.5px solid var(--color-border-secondary); border-radius: 8px;
+    background: transparent; cursor: pointer; font-size: 13px; color: var(--color-text-primary);
+    transition: background 0.15s;
+  }
+  .btn:hover { background: var(--color-background-secondary); }
+  .btn.primary { background: #185FA5; color: #fff; border-color: #185FA5; }
+  .btn.primary:hover { background: #0C447C; }
+  .btn i { font-size: 15px; }
+  .range-pill {
+    display: flex; border: 0.5px solid var(--color-border-tertiary); border-radius: 8px; overflow: hidden;
+  }
+  .range-opt {
+    padding: 7px 12px; font-size: 12px; cursor: pointer; color: var(--muted);
+    background: transparent; transition: all 0.12s;
+  }
+  .range-opt.sel { background: var(--color-background-secondary); color: var(--color-text-primary); font-weight: 500; }
+  .content { flex: 1; overflow-y: auto; padding: 20px 24px; background: var(--color-background-tertiary); }
+  .metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+  .metric-card {
+    background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-lg); padding: 16px;
+  }
+  .metric-head { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; }
+  .metric-label { font-size: 12px; color: var(--muted); font-weight: 400; }
+  .metric-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+  .metric-icon.blue { background: #E6F1FB; }
+  .metric-icon.blue i { color: #185FA5; }
+  .metric-icon.green { background: #EAF3DE; }
+  .metric-icon.green i { color: #3B6D11; }
+  .metric-icon.amber { background: #FAEEDA; }
+  .metric-icon.amber i { color: #854F0B; }
+  .metric-icon.purple { background: #EEEDFE; }
+  .metric-icon.purple i { color: #534AB7; }
+  .metric-icon i { font-size: 16px; }
+  .metric-val { font-size: 24px; font-weight: 500; color: var(--color-text-primary); line-height: 1; }
+  .metric-change { display: flex; align-items: center; gap: 4px; margin-top: 6px; font-size: 12px; }
+  .metric-change.up { color: #3B6D11; }
+  .metric-change.down { color: #A32D2D; }
+  .metric-change i { font-size: 13px; }
+  .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .chart-card {
+    background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-lg); padding: 18px;
+  }
+  .chart-title { font-size: 14px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 4px; }
+  .chart-sub { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
+  .bottom-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .table-card {
+    background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-lg); padding: 18px;
+  }
+  .table-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); padding: 6px 0; border-bottom: 0.5px solid var(--color-border-tertiary); }
+  td { padding: 10px 0; border-bottom: 0.5px solid var(--color-border-tertiary); color: var(--color-text-primary); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  .status-pill { padding: 2px 9px; border-radius: 20px; font-size: 11px; font-weight: 500; display: inline-block; }
+  .s-active { background: #EAF3DE; color: #3B6D11; }
+  .s-pending { background: #FAEEDA; color: #854F0B; }
+  .s-paused { background: #F1EFE8; color: #5F5E5A; }
+  .sparkline-container { position: relative; height: 60px; }
+  .activity-list { list-style: none; }
+  .activity-item { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 0.5px solid var(--color-border-tertiary); }
+  .activity-item:last-child { border-bottom: none; }
+  .act-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+  .act-text { font-size: 13px; color: var(--color-text-primary); line-height: 1.5; }
+  .act-time { font-size: 11px; color: var(--muted); margin-top: 1px; }
+  .progress-bar { height: 5px; border-radius: 3px; background: var(--color-background-secondary); overflow: hidden; margin-top: 5px; }
+  .progress-fill { height: 100%; border-radius: 3px; }
+  .legend { display: flex; gap: 14px; margin-bottom: 10px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); }
+  .legend-dot { width: 8px; height: 8px; border-radius: 2px; }
+  @media (max-width: 700px) {
+    .sidebar { display: none; }
+    .metrics-grid { grid-template-columns: repeat(2,1fr); }
+    .charts-row, .bottom-row { grid-template-columns: 1fr; }
+  }
+</style>
+
+<h2 class="sr-only">Intelligent Analytics Platform dashboard showing key metrics, revenue trends, user acquisition, top campaigns, and recent activity.</h2>
+
+<div class="shell">
+  <nav class="sidebar" aria-label="Main navigation">
+    <div class="logo">
+      <div class="logo-icon"><i class="ti ti-chart-dots" aria-hidden="true"></i></div>
+      <div>
+        <div class="logo-text">IntelliAnalytics</div>
+        <div class="logo-sub">v2.4.1</div>
+      </div>
+    </div>
+    <div class="nav">
+      <div class="nav-section">Overview</div>
+      <div class="nav-item active"><i class="ti ti-layout-dashboard" aria-hidden="true"></i> Dashboard</div>
+      <div class="nav-item"><i class="ti ti-chart-bar" aria-hidden="true"></i> Reports <span class="nav-badge">3</span></div>
+      <div class="nav-item"><i class="ti ti-table" aria-hidden="true"></i> Data Explorer</div>
+      <div class="nav-section">Modules</div>
+      <div class="nav-item"><i class="ti ti-users" aria-hidden="true"></i> Audience</div>
+      <div class="nav-item"><i class="ti ti-target-arrow" aria-hidden="true"></i> Campaigns</div>
+      <div class="nav-item"><i class="ti ti-brand-speedtest" aria-hidden="true"></i> Performance</div>
+      <div class="nav-item"><i class="ti ti-robot" aria-hidden="true"></i> AI Insights <span class="nav-badge">New</span></div>
+      <div class="nav-section">System</div>
+      <div class="nav-item"><i class="ti ti-settings" aria-hidden="true"></i> Settings</div>
+      <div class="nav-item"><i class="ti ti-bell" aria-hidden="true"></i> Alerts <span class="nav-badge">5</span></div>
+    </div>
+    <div class="sidebar-footer">
+      <div class="avatar">AR</div>
+      <div>
+        <div class="avatar-name">Aryan R.</div>
+        <div class="avatar-role">Analyst</div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title">Dashboard</div>
+        <div class="topbar-sub">Last updated: today at 11:42 AM</div>
+      </div>
+      <div class="topbar-actions">
+        <div class="range-pill" role="group" aria-label="Time range">
+          <div class="range-opt" onclick="setRange(this,'7d')">7d</div>
+          <div class="range-opt sel" onclick="setRange(this,'30d')">30d</div>
+          <div class="range-opt" onclick="setRange(this,'90d')">90d</div>
+          <div class="range-opt" onclick="setRange(this,'1y')">1y</div>
+        </div>
+        <button class="btn" onclick="sendPrompt('Explain the top insights from this dashboard')"><i class="ti ti-sparkles" aria-hidden="true"></i> AI Insights</button>
+        <button class="btn primary"><i class="ti ti-download" aria-hidden="true"></i> Export</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-head">
+            <div class="metric-label">Total Revenue</div>
+            <div class="metric-icon blue"><i class="ti ti-currency-dollar" aria-hidden="true"></i></div>
+          </div>
+          <div class="metric-val" id="m-rev">$2.84M</div>
+          <div class="metric-change up"><i class="ti ti-trending-up"></i> +14.3% vs last period</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-head">
+            <div class="metric-label">Active Users</div>
+            <div class="metric-icon green"><i class="ti ti-users" aria-hidden="true"></i></div>
+          </div>
+          <div class="metric-val" id="m-users">48,291</div>
+          <div class="metric-change up"><i class="ti ti-trending-up"></i> +8.7% vs last period</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-head">
+            <div class="metric-label">Conversion Rate</div>
+            <div class="metric-icon amber"><i class="ti ti-percentage" aria-hidden="true"></i></div>
+          </div>
+          <div class="metric-val" id="m-conv">3.61%</div>
+          <div class="metric-change down"><i class="ti ti-trending-down"></i> −0.4% vs last period</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-head">
+            <div class="metric-label">Avg. Session</div>
+            <div class="metric-icon purple"><i class="ti ti-clock" aria-hidden="true"></i></div>
+          </div>
+          <div class="metric-val" id="m-sess">4m 38s</div>
+          <div class="metric-change up"><i class="ti ti-trending-up"></i> +22s vs last period</div>
+        </div>
+      </div>
+
+      <div class="charts-row">
+        <div class="chart-card">
+          <div class="chart-title">Revenue over time</div>
+          <div class="chart-sub">Monthly breakdown, current period</div>
+          <div class="legend">
+            <span class="legend-item"><span class="legend-dot" style="background:#185FA5"></span>Revenue</span>
+            <span class="legend-item"><span class="legend-dot" style="background:#5DCAA5;"></span>Target</span>
+          </div>
+          <div style="position:relative;height:200px;">
+            <canvas id="revenueChart" role="img" aria-label="Line chart showing monthly revenue vs target over 8 months">Revenue data chart</canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">User acquisition by channel</div>
+          <div class="chart-sub">Source distribution, current period</div>
+          <div class="legend">
+            <span class="legend-item"><span class="legend-dot" style="background:#185FA5"></span>Organic</span>
+            <span class="legend-item"><span class="legend-dot" style="background:#534AB7"></span>Paid</span>
+            <span class="legend-item"><span class="legend-dot" style="background:#5DCAA5"></span>Referral</span>
+            <span class="legend-item"><span class="legend-dot" style="background:#EF9F27"></span>Social</span>
+          </div>
+          <div style="position:relative;height:200px;">
+            <canvas id="channelChart" role="img" aria-label="Doughnut chart showing user acquisition by channel">Channel distribution chart</canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-row">
+        <div class="table-card">
+          <div class="table-header">
+            <div>
+              <div class="chart-title">Top campaigns</div>
+              <div class="chart-sub">Ranked by performance score</div>
+            </div>
+            <button class="btn" style="font-size:12px;" onclick="sendPrompt('Which campaigns should I optimize next?')"><i class="ti ti-sparkles"></i> Suggest ↗</button>
+          </div>
+          <table aria-label="Top campaigns table">
+            <thead>
+              <tr><th>Campaign</th><th>CTR</th><th>Budget</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><div style="font-weight:500">Summer Launch</div><div style="font-size:11px;color:var(--muted)">Email · 18 Jul</div></td>
+                <td>5.2%<div class="progress-bar"><div class="progress-fill" style="width:52%;background:#185FA5"></div></div></td>
+                <td>$12,400</td>
+                <td><span class="status-pill s-active">Active</span></td>
+              </tr>
+              <tr>
+                <td><div style="font-weight:500">Re-engage Q3</div><div style="font-size:11px;color:var(--muted)">Push · 2 Aug</div></td>
+                <td>3.8%<div class="progress-bar"><div class="progress-fill" style="width:38%;background:#185FA5"></div></div></td>
+                <td>$8,200</td>
+                <td><span class="status-pill s-active">Active</span></td>
+              </tr>
+              <tr>
+                <td><div style="font-weight:500">Product Reveal</div><div style="font-size:11px;color:var(--muted)">Display · 10 Aug</div></td>
+                <td>2.1%<div class="progress-bar"><div class="progress-fill" style="width:21%;background:#EF9F27"></div></div></td>
+                <td>$5,600</td>
+                <td><span class="status-pill s-pending">Pending</span></td>
+              </tr>
+              <tr>
+                <td><div style="font-weight:500">Loyalty Drive</div><div style="font-size:11px;color:var(--muted)">SMS · 15 Aug</div></td>
+                <td>1.5%<div class="progress-bar"><div class="progress-fill" style="width:15%;background:#888780"></div></div></td>
+                <td>$3,100</td>
+                <td><span class="status-pill s-paused">Paused</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="table-card">
+          <div class="table-header">
+            <div>
+              <div class="chart-title">Recent activity</div>
+              <div class="chart-sub">System and user events</div>
+            </div>
+            <button class="btn" style="font-size:12px;"><i class="ti ti-refresh"></i> Refresh</button>
+          </div>
+          <ul class="activity-list" aria-label="Recent activity">
+            <li class="activity-item">
+              <div class="act-dot" style="background:#185FA5"></div>
+              <div><div class="act-text">AI model retrained on latest dataset — accuracy improved to 94.2%</div><div class="act-time">2 min ago · System</div></div>
+            </li>
+            <li class="activity-item">
+              <div class="act-dot" style="background:#3B6D11"></div>
+              <div><div class="act-text">Campaign "Summer Launch" hit CTR milestone of 5%</div><div class="act-time">34 min ago · Campaign</div></div>
+            </li>
+            <li class="activity-item">
+              <div class="act-dot" style="background:#854F0B"></div>
+              <div><div class="act-text">Anomaly detected: spike in bounce rate on /pricing page</div><div class="act-time">1 hr ago · Alert</div></div>
+            </li>
+            <li class="activity-item">
+              <div class="act-dot" style="background:#534AB7"></div>
+              <div><div class="act-text">New segment "High-intent visitors" created — 4,821 users</div><div class="act-time">3 hr ago · Audience</div></div>
+            </li>
+            <li class="activity-item">
+              <div class="act-dot" style="background:#888780"></div>
+              <div><div class="act-text">Weekly report exported by Aryan R. (PDF, 2.4 MB)</div><div class="act-time">5 hr ago · Reports</div></div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+function setRange(el, r) {
+  document.querySelectorAll('.range-opt').forEach(e => e.classList.remove('sel'));
+  el.classList.add('sel');
+  const data = {
+    '7d':  { rev: '$0.62M', users: '11,204', conv: '3.71%', sess: '4m 12s', rData: [42,55,60,48,70,82,65], tData: [50,55,60,60,65,70,70] },
+    '30d': { rev: '$2.84M', users: '48,291', conv: '3.61%', sess: '4m 38s', rData: [180,210,195,240,260,230,270,285], tData: [200,205,210,220,230,235,250,260] },
+    '90d': { rev: '$7.10M', users: '143,880', conv: '3.55%', sess: '4m 50s', rData: [600,650,700,680,740,790,820,860,900], tData: [650,670,690,710,730,750,780,810,840] },
+    '1y':  { rev: '$28.3M', users: '521,400', conv: '3.48%', sess: '5m 02s', rData: [1800,2100,2300,2100,2500,2700,2400,2800,3100,3000,3300,3500], tData: [2000,2100,2200,2200,2300,2400,2500,2600,2700,2800,2900,3000] }
+  };
+  const d = data[r];
+  document.getElementById('m-rev').textContent = d.rev;
+  document.getElementById('m-users').textContent = d.users;
+  document.getElementById('m-conv').textContent = d.conv;
+  document.getElementById('m-sess').textContent = d.sess;
+  const labels = { '7d': ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], '30d': ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug'], '90d': ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep'], '1y': ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'] };
+  revChart.data.labels = labels[r];
+  revChart.data.datasets[0].data = d.rData;
+  revChart.data.datasets[1].data = d.tData;
+  revChart.update();
+}
+
+const revChart = new Chart(document.getElementById('revenueChart'), {
+  type: 'line',
+  data: {
+    labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug'],
+    datasets: [
+      { label: 'Revenue', data: [180,210,195,240,260,230,270,285], borderColor: '#185FA5', backgroundColor: 'rgba(24,95,165,0.08)', fill: true, tension: 0.4, pointRadius: 3, borderWidth: 2 },
+      { label: 'Target', data: [200,205,210,220,230,235,250,260], borderColor: '#5DCAA5', borderDash: [5,4], backgroundColor: 'transparent', fill: false, tension: 0.4, pointRadius: 0, borderWidth: 1.5 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
+    scales: {
+      x: { grid: { display: false }, ticks: { font: { size: 11 }, color: '#888780' } },
+      y: { grid: { color: 'rgba(136,135,128,0.12)' }, ticks: { font: { size: 11 }, color: '#888780', callback: v => '$' + v + 'K' } }
+    }
+  }
+});
+
+new Chart(document.getElementById('channelChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Organic','Paid','Referral','Social'],
+    datasets: [{
+      data: [38, 29, 18, 15],
+      backgroundColor: ['#185FA5','#534AB7','#5DCAA5','#EF9F27'],
+      borderWidth: 0,
+      hoverOffset: 8
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false, cutout: '68%',
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' ' + ctx.label + ': ' + ctx.parsed + '%' } } }
+  }
+});
+</script>
